@@ -1,0 +1,10 @@
+{
+    "name":"av/searchreport",
+    "type":"magento-module",
+    "license":"OSL-3.0",
+    "homepage":"https://github.com/adamvarga/AV_SearchReport",
+    "description":"A report is published weekly with maximum 500 keywords in the form of a CSV file under var/search_report and it will be sent with attachment by e-mail.",
+    "require":{
+        "magento-hackathon/magento-composer-installer":"*"
+    }
+}

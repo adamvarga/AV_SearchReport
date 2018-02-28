@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <AV_SearchReport>
+            <version>1.0.0</version>
+        </AV_SearchReport>
+    </modules>
+    <global>
+        <blocks>
+            <av_searchreport>
+                <class>AV_SearchReport_Block</class>
+            </av_searchreport>
+        </blocks>
+        <helpers>
+            <av_searchreport>
+                <class>AV_SearchReport_Helper</class>
+            </av_searchreport>
+        </helpers>
+        <models>
+            <av_searchreport>
+                <class>AV_SearchReport_Model</class>
+            </av_searchreport>
+        </models>
+    </global>
+    <crontab>
+        <jobs>
+            <av_searchreport_reportsend>
+                <schedule>
+                    <cron_expr>0 0 7 * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>av_searchreport/observer::run</model>
+                </run>
+            </av_searchreport_reportsend>
+        </jobs>
+    </crontab>
+</config>
