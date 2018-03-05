@@ -2,6 +2,7 @@ AV_SearchReport
 =====================
 - The extension based on search terms from catalogsearch/query table. A report is published weekly with maximum 500 keywords in the form of a CSV file under var/search_report and it will be sent with attachment by e-mail.
 - Most relevant is the "Search query", "All search result" and "Number of visit" column in CSV, analogous like search terms in Magento Backend.
+- After send a mail the column 'popularity' is in Database emptied, then the new weekly statistic begins.
 
 Installation Instructions
 -------------------------

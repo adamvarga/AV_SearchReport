@@ -1,18 +1,20 @@
 <?php
 
-class AV_SearchReport_Model_Report {
+class AV_SearchReport_Model_Report
+{
     /*
      *  Get catalogsearch collection from last 7 days
      */
 
-    public function getCatalogSearch() {
+    public function getCatalogSearch()
+    {
 
         $from_date = date('Y-m-d H:i:s', time() - (60 * 60 * 24 * 7));
 
         $search = Mage::getModel('catalogsearch/query')
-                ->getCollection()
-                ->setPageSize(500)
-                ->addFieldToFilter('updated_at', array('from' => $from_date));
+            ->getCollection()
+            ->setPageSize(500)
+            ->addFieldToFilter('updated_at', array('from' => $from_date));
 
         return $search;
     }
@@ -21,7 +23,8 @@ class AV_SearchReport_Model_Report {
      * Get date timestamp from helper
      */
 
-    public function getTimestamp() {
+    public function getTimestamp()
+    {
         return Mage::helper('av_searchreport')->createTimestamp();
     }
 
@@ -29,7 +32,8 @@ class AV_SearchReport_Model_Report {
      *  Prepare CSV to report
      */
 
-    public function preparationCsv() {
+    public function preparationCsv()
+    {
 
         $search_result = $this->getCatalogSearch();
         $csv = new Varien_File_Csv();
@@ -45,7 +49,6 @@ class AV_SearchReport_Model_Report {
             "All search result",
             "Number of visit"
         );
-        $data = array();
         $csvdata[] = $_columns;
 
         foreach ($search_result as $result) {
@@ -59,8 +62,8 @@ class AV_SearchReport_Model_Report {
             $data[] = $popularity;
 
             $csvdata[] = $data;
-            $i++;
         }
+
         $csv->setDelimiter(',');
         $csv->setEnclosure('"');
         $csv->saveData($file, $csvdata);
@@ -68,33 +71,65 @@ class AV_SearchReport_Model_Report {
     }
 
     /*
+    * Reset popularity to 0
+    */
+
+    public function cleanDb($result)
+    {
+        $resource = Mage::getSingleton('core/resource');
+        $write = $resource->getConnection('core_write');
+        $table = $resource->getTableName('catalogsearch/search_query');
+
+        $write->update(
+            $table,
+            array('popularity' => 0)
+        );
+    }
+
+    /*
      * Send csv attachements
      */
 
-    public function sendMail($attachements) {
-
-        $mail = new Zend_Mail('utf-8');
-        $recipients = array(
-            Mage::getStoreConfig('trans_email/ident_custom1/name') => Mage::getStoreConfig('trans_email/ident_custom1/email'),
-            Mage::getStoreConfig('trans_email/ident_custom2/name') => Mage::getStoreConfig('trans_email/ident_custom2/email'),
-        );
-        $mail_body = "Search Report";
-        $from_name = Mage::getStoreConfig('trans_email/ident_general/name');
-        $mail->setBodyHtml($mail_body)
-                ->setSubject('Search Report' . ' ' . $this->getTimestamp())
-                ->addTo($recipients)
-                ->setFrom(Mage::getStoreConfig('trans_email/ident_general/email'), $from_name);
+    public function sendMail($attachements)
+    {
 
         $file = $attachements;
-        $attachment = file_get_contents($file);
-        $mail->createAttachment(
-                $attachment, Zend_Mime::TYPE_OCTETSTREAM, Zend_Mime::DISPOSITION_ATTACHMENT, Zend_Mime::ENCODING_BASE64, 'searchreport' . '_' . $this->getTimestamp() . '.csv'
+        $template_id = 'result';
+        $msg = 'Search Report ' . $this->getTimestamp();
+        $mail = Mage::getModel('core/email_template')->loadDefault($template_id);
+        $mail_from = Mage::getStoreConfig('trans_email/ident_general/email');
+        $mail_to = Mage::getStoreConfig('trans_email/ident_custom1/email');
+        $customer_name = Mage::getStoreConfig('trans_email/ident_general/name');
+        $mail_subject = "AV Search Report";
+        $mail_name = Mage::getStoreConfig('trans_email/ident_general/name');
+        $mail->setSenderName($mail_name);
+        $mail->setSenderEmail($mail_to);
+        $mail->getMail()->createAttachment(
+            file_get_contents($file),
+            Zend_Mime::TYPE_OCTETSTREAM,
+            Zend_Mime::DISPOSITION_ATTACHMENT,
+            Zend_Mime::ENCODING_BASE64,
+            $file
         );
+
+        $email_template_variables = array(
+            'customer_name' => $customer_name,
+            'message' => $msg
+        );
+
+        $mail->setTemplateSubject(trim($mail_subject));
+        $mail->setFromEmail($mail_from);
+        $mail->setFromName($mail_name);
+        $mail->setType('html');
+
+
         try {
-            $mail->send();
+            $mail->send($mail_to, $customer_name, $email_template_variables);
+            $this->cleanDb();
         } catch (Exception $e) {
             Mage::logException($e);
         }
+
     }
 
 }

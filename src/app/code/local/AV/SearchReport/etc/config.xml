@@ -21,7 +21,38 @@
                 <class>AV_SearchReport_Model</class>
             </av_searchreport>
         </models>
+        <template>
+            <email>
+                <result module="av_searchreport">
+                    <label>Search report template</label>
+                    <file>report/result.html</file>
+                    <type>html</type>
+                </result>
+            </email>
+        </template>
     </global>
+    <adminhtml>
+        <translate>
+            <modules>
+                <av_searchreport>
+                    <files>
+                        <default>AV_SearchReport.csv</default>
+                    </files>
+                </av_searchreport>
+            </modules>
+        </translate>
+    </adminhtml>
+    <frontend>
+        <translate>
+            <modules>
+                <av_searchreport>
+                    <files>
+                        <default>AV_SearchReport.csv</default>
+                    </files>
+                </av_searchreport>
+            </modules>
+        </translate>
+    </frontend>
     <crontab>
         <jobs>
             <av_searchreport_reportsend>
