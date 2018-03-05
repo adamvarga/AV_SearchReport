@@ -74,7 +74,7 @@ class AV_SearchReport_Model_Report
     * Reset popularity to 0
     */
 
-    public function cleanDb($result)
+    public function cleanDb()
     {
         $resource = Mage::getSingleton('core/resource');
         $write = $resource->getConnection('core_write');
