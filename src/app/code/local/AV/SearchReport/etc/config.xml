@@ -23,11 +23,11 @@
         </models>
         <template>
             <email>
-                <result module="av_searchreport">
+                <searchreport_result module="av_searchreport">
                     <label>Search report template</label>
-                    <file>report/result.html</file>
+                    <file>searchreport/result.html</file>
                     <type>html</type>
-                </result>
+                </searchreport_result>
             </email>
         </template>
     </global>

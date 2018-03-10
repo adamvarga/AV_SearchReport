@@ -94,7 +94,7 @@ class AV_SearchReport_Model_Report
     {
 
         $file = $attachements;
-        $template_id = 'result';
+        $template_id = 'searchreport_result';
         $msg = 'Search Report ' . $this->getTimestamp();
         $mail = Mage::getModel('core/email_template')->loadDefault($template_id);
         $mail_from = Mage::getStoreConfig('trans_email/ident_general/email');
